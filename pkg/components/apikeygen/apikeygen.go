@@ -32,7 +32,16 @@ func New(orgId int64, name string) (KeyGenResult, error) {
 	if err != nil {
 		return result, err
 	}
+	// util.EncodePassword(prefix, jsonKey.Key, jsonKey.Name)
 
+	// prev
+	// --
+	// key1
+	// key2
+	// --
+	// new
+	// customer1, grafana-key1
+	// customer2, grafana-key2
 	result.HashedKey, err = util.EncodePassword(jsonKey.Key, name)
 	if err != nil {
 		return result, err
