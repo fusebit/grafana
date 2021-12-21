@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"github.com/grafana/grafana/pkg/bus"
+	"github.com/grafana/grafana/pkg/infra/tracing"
 	"github.com/grafana/grafana/pkg/models"
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
@@ -21,6 +22,9 @@ import (
 
 func TestAlertRulePermissions(t *testing.T) {
 	// Setup Grafana and its Database
+	err := tracing.InitializeTracerForTest()
+	require.NoError(t, err)
+
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
 		EnableUnifiedAlerting: true,
@@ -39,7 +43,7 @@ func TestAlertRulePermissions(t *testing.T) {
 	})
 
 	// Create the namespace we'll save our alerts to.
-	_, err := createFolder(t, store, 0, "folder1")
+	_, err = createFolder(t, store, 0, "folder1")
 	require.NoError(t, err)
 
 	_, err = createFolder(t, store, 0, "folder2")
@@ -323,6 +327,8 @@ func createRule(t *testing.T, grafanaListedAddr string, folder string, user, pas
 }
 
 func TestAlertRuleConflictingTitle(t *testing.T) {
+	err := tracing.InitializeTracerForTest()
+	require.NoError(t, err)
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -337,7 +343,7 @@ func TestAlertRuleConflictingTitle(t *testing.T) {
 	store.Bus = bus.GetBus()
 
 	// Create the namespace we'll save our alerts to.
-	_, err := createFolder(t, store, 0, "folder1")
+	_, err = createFolder(t, store, 0, "folder1")
 	require.NoError(t, err)
 	_, err = createFolder(t, store, 0, "folder2")
 	require.NoError(t, err)
@@ -447,6 +453,9 @@ func TestAlertRuleConflictingTitle(t *testing.T) {
 }
 
 func TestRulerRulesFilterByDashboard(t *testing.T) {
+	err := tracing.InitializeTracerForTest()
+	require.NoError(t, err)
+
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		EnableFeatureToggles: []string{"ngalert"},
 		DisableAnonymous:     true,
