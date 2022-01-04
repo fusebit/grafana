@@ -58,6 +58,8 @@ export const LogsPanel: React.FunctionComponent<LogsPanelProps> = ({
     [eventBus]
   );
 
+  console.log(logsContainerRef);
+
   // Important to memoize stuff here, as panel rerenders a lot for example when resizing.
   const [logRows, deduplicatedRows, commonLabels] = useMemo(() => {
     const newResults = data ? dataFrameToLogsModel(data.series, data.request?.intervalMs) : null;
@@ -70,6 +72,8 @@ export const LogsPanel: React.FunctionComponent<LogsPanelProps> = ({
   useLayoutEffect(() => {
     if (isAscending && logsContainerRef.current) {
       setScrollTop(logsContainerRef.current.offsetHeight);
+    } else if (logsContainerRef.current) {
+      setScrollTop(logsContainerRef.current.scrollHeight);
     } else {
       setScrollTop(0);
     }
