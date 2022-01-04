@@ -25,7 +25,7 @@
     "@grafana/schema": "8.4.0-pre",
     "@types/d3-interpolate": "^1.4.0",
     "d3-interpolate": "1.4.0",
-    "date-fns": "2.21.3",
+    "date-fns": "2.27.0",
     "eventemitter3": "4.0.7",
     "lodash": "4.17.21",
     "marked": "4.0.5",
@@ -39,7 +39,7 @@
     "rxjs": "7.3.0",
     "tslib": "2.3.1",
     "uplot": "1.6.16",
-    "xss": "1.0.6"
+    "xss": "1.0.10"
   },
   "devDependencies": {
     "@grafana/tsconfig": "^1.0.0-rc1",
