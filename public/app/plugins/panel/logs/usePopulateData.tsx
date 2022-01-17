@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
 import { DEFAULT_CONTAINER_ID, DEFAULT_HOSTNAME, DEFAULT_MESSAGE, DEFAULT_TIME } from './constants';
+import { ArrayVector } from '../../../../../packages/grafana-data';
 
 interface Props {
   data: any;
@@ -11,50 +12,43 @@ interface ExternalLog {
   timestamp: number;
 }
 
+interface Field {
+  values: ArrayVector;
+}
+
 const usePopulateData = ({ data }: Props) => {
   const [newData, setNewData] = useState(data);
   const [externalLogs, setExternalLogs] = useState<ExternalLog[]>([]);
 
   const addMessageToData = (data: any, log: ExternalLog) => {
     data.series = data.series || [];
+
     const lastFrame = data.series.length - 1;
     const index = lastFrame < 0 ? 0 : lastFrame;
-    const series = data.series[index] || {};
+
+    data.series[index] = data.series[index] || {};
+
+    const series = data.series[index];
     series.fields = series.fields || [];
+
     const fields = series.fields;
-    data.series[index] = series;
 
-    if (!fields[0]) {
-      fields[0] = DEFAULT_TIME;
-    }
+    fields[0] = fields[0] || DEFAULT_TIME;
+    fields[1] = fields[1] || DEFAULT_MESSAGE;
+    fields[2] = fields[2] || DEFAULT_CONTAINER_ID;
+    fields[3] = fields[3] || DEFAULT_HOSTNAME;
 
-    if (!fields[1]) {
-      fields[1] = DEFAULT_MESSAGE;
-    }
+    const time = fields[0] as Field;
+    const message = fields[1] as Field;
+    const containerId = fields[2] as Field;
+    const hostname = fields[3] as Field;
 
-    if (!fields[2]) {
-      fields[2] = DEFAULT_CONTAINER_ID;
-    }
-
-    if (!fields[3]) {
-      fields[3] = DEFAULT_HOSTNAME;
-    }
-
-    const time = fields[0];
-    const message = fields[1];
-    const containerId = fields[2];
-    const hostname = fields[3];
-
-    //@ts-ignore
     time.values.add(log.timestamp);
-    //@ts-ignore
     message.values.add(log.msg);
-    //@ts-ignore
     containerId.values.add(log.timestamp);
-    //@ts-ignore
     hostname.values.add(log.msg);
 
-    data.series[index].length = data.series[index].length ? data.series[index].length + 1 : 1;
+    series.length = series.length ? series.length + 1 : 1;
 
     return data;
   };
@@ -65,13 +59,17 @@ const usePopulateData = ({ data }: Props) => {
       clonedData = addMessageToData(clonedData, log);
     });
     setNewData(clonedData);
-
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   useEffect(() => {
     const postMessage = ({ data }: any) => {
-      const msg = JSON.stringify(data);
+      let msg = '';
+      try {
+        msg = JSON.parse(data || '{}');
+      } catch (e) {
+        msg = data || '';
+      }
       const logs: ExternalLog[] = [...externalLogs];
       const newLog: ExternalLog = {
         msg,
