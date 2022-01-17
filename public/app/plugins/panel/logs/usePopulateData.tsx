@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { cloneDeep } from 'lodash';
-import { DEFAULT_CONTAINER_ID, DEFAULT_HOSTNAME, DEFAULT_MESSAGE, DEFAULT_TIME } from './constants';
+import { DEFAULT_ID, DEFAULT_TS_NS, DEFAULT_LINE, DEFAULT_TS } from './constants';
 import { ArrayVector } from '../../../../../packages/grafana-data';
 
 interface Props {
@@ -33,20 +33,20 @@ const usePopulateData = ({ data }: Props) => {
 
     const fields = series.fields;
 
-    fields[0] = fields[0] || DEFAULT_TIME;
-    fields[1] = fields[1] || DEFAULT_MESSAGE;
-    fields[2] = fields[2] || DEFAULT_CONTAINER_ID;
-    fields[3] = fields[3] || DEFAULT_HOSTNAME;
+    fields[0] = fields[0] || DEFAULT_TS;
+    fields[1] = fields[1] || DEFAULT_LINE;
+    fields[2] = fields[2] || DEFAULT_ID;
+    fields[3] = fields[3] || DEFAULT_TS_NS;
 
-    const time = fields[0] as Field;
-    const message = fields[1] as Field;
-    const containerId = fields[2] as Field;
-    const hostname = fields[3] as Field;
+    const ts = fields[0] as Field;
+    const line = fields[1] as Field;
+    const id = fields[2] as Field;
+    const tsNs = fields[3] as Field;
 
-    time.values.add(log.timestamp);
-    message.values.add(log.msg);
-    containerId.values.add(log.timestamp);
-    hostname.values.add(log.msg);
+    ts.values.add(new Date(log.timestamp).toISOString());
+    line.values.add(log.msg);
+    id.values.add(log.timestamp);
+    tsNs.values.add(log.timestamp);
 
     series.length = series.length ? series.length + 1 : 1;
 

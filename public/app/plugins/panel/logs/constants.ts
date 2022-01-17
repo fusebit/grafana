@@ -1,6 +1,6 @@
 import { ArrayVector } from '@grafana/data';
 
-export const DEFAULT_TIME = {
+export const DEFAULT_TS = {
   name: 'ts',
   type: 'time',
   values: new ArrayVector([]),
@@ -9,21 +9,21 @@ export const DEFAULT_TIME = {
   },
 };
 
-export const DEFAULT_MESSAGE = {
+export const DEFAULT_LINE = {
   name: 'line',
   type: 'string',
   values: new ArrayVector([]),
   config: {},
 };
 
-export const DEFAULT_CONTAINER_ID = {
+export const DEFAULT_ID = {
   name: 'id',
   type: 'string',
   values: new ArrayVector([]),
   config: {},
 };
 
-export const DEFAULT_HOSTNAME = {
+export const DEFAULT_TS_NS = {
   name: 'tsNs',
   type: 'time',
   values: new ArrayVector([]),
