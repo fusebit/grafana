@@ -12,6 +12,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+          ref: fusebit-v1.0.0-8.3.3
       - name: Version
         run: export FUSEBIT_VERSION=$(cat .fusebit.version.json | jq -r .version)
       - name: Publish Tags
