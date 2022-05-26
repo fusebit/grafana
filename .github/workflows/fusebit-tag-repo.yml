@@ -1,5 +1,3 @@
-###################################################################
-# Auto-created by the cicd-actions tool
 on:
   push:
     branches:
@@ -15,7 +13,7 @@ jobs:
         with:
           fetch-depth: 0
       - name: Version
-        run: FUSEBIT_VERSION=$(cat .fusebit.version.json | jq -r .version)
+        run: export FUSEBIT_VERSION=$(cat .fusebit.version.json | jq -r .version)
       - name: Publish Tags
         run: |
           git tag ${FUSEBIT_VERSION} || true
