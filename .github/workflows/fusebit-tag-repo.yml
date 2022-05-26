@@ -1,0 +1,22 @@
+###################################################################
+# Auto-created by the cicd-actions tool
+on:
+  push:
+    branches:
+      - fusebit-v1.0.0-8.3.3
+name: Publish And Tag All Artifacts
+jobs:
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Version
+        run: FUSEBIT_VERSION=$(echo .fusebit.version | jq .fusebit.version.json)
+      - name: Publish - tags
+        run: |
+          git tag ${FUSEBIT_VERSION} || true
+          git push --tags || true
