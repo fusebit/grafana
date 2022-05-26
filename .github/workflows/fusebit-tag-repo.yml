@@ -2,10 +2,10 @@ on:
   push:
     branches:
       - fusebit-v1.0.0-8.3.3
-name: Publish And Tag All Artifacts
+name: Tag
 jobs:
-  deploy:
-    name: Deploy
+  tag:
+    name: tag
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
