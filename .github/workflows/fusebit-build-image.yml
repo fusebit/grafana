@@ -1,6 +1,6 @@
 name: Fusebit - Publish
 on:
-  push:
+  create:
     tags:
       - '*'
 
