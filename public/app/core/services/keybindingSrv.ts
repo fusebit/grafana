@@ -23,12 +23,14 @@ import { withFocusedPanel } from './withFocusedPanelId';
 import { HelpModal } from '../components/help/HelpModal';
 
 export class KeybindingSrv {
+  private isInAnIframe = window.location !== window.parent.location;
+
   reset() {
     Mousetrap.reset();
   }
 
   initGlobals() {
-    if (locationService.getLocation().pathname !== '/login') {
+    if (locationService.getLocation().pathname !== '/login' && !this.isInAnIframe) {
       this.bind(['?', 'h'], this.showHelpModal);
       this.bind('g h', this.goToHome);
       this.bind('g a', this.openAlerting);
@@ -39,8 +41,10 @@ export class KeybindingSrv {
       this.bindGlobal('esc', this.globalEsc);
     }
 
-    this.bind('t t', () => toggleTheme(false));
-    this.bind('t r', () => toggleTheme(true));
+    if (!this.isInAnIframe) {
+      this.bind('t t', () => toggleTheme(false));
+      this.bind('t r', () => toggleTheme(true));
+    }
   }
 
   private globalEsc() {
@@ -166,156 +170,158 @@ export class KeybindingSrv {
   }
 
   setupDashboardBindings(dashboard: DashboardModel) {
-    this.bind('mod+o', () => {
-      dashboard.graphTooltip = (dashboard.graphTooltip + 1) % 3;
-      dashboard.events.publish(new LegacyGraphHoverClearEvent());
-      dashboard.startRefresh();
-    });
+    if (!this.isInAnIframe) {
+      this.bind('mod+o', () => {
+        dashboard.graphTooltip = (dashboard.graphTooltip + 1) % 3;
+        dashboard.events.publish(new LegacyGraphHoverClearEvent());
+        dashboard.startRefresh();
+      });
 
-    this.bind('mod+s', () => {
-      if (dashboard.meta.canSave) {
+      this.bind('mod+s', () => {
+        if (dashboard.meta.canSave) {
+          appEvents.publish(
+            new ShowModalReactEvent({
+              component: SaveDashboardModalProxy,
+              props: {
+                dashboard,
+              },
+            })
+          );
+        }
+      });
+
+      this.bind('t z', () => {
+        appEvents.publish(new ZoomOutEvent(2));
+      });
+
+      this.bind('ctrl+z', () => {
+        appEvents.publish(new ZoomOutEvent(2));
+      });
+
+      this.bind('t left', () => {
+        appEvents.publish(new ShiftTimeEvent(ShiftTimeEventPayload.Left));
+      });
+
+      this.bind('t right', () => {
+        appEvents.publish(new ShiftTimeEvent(ShiftTimeEventPayload.Right));
+      });
+
+      // edit panel
+      this.bindWithPanelId('e', (panelId) => {
+        if (dashboard.canEditPanelById(panelId)) {
+          const isEditing = locationService.getSearchObject().editPanel !== undefined;
+          locationService.partial({ editPanel: isEditing ? null : panelId });
+        }
+      });
+
+      // view panel
+      this.bindWithPanelId('v', (panelId) => {
+        const isViewing = locationService.getSearchObject().viewPanel !== undefined;
+        locationService.partial({ viewPanel: isViewing ? null : panelId });
+      });
+
+      this.bindWithPanelId('i', (panelId) => {
+        locationService.partial({ inspect: panelId });
+      });
+
+      // jump to explore if permissions allow
+      if (contextSrv.hasAccessToExplore()) {
+        this.bindWithPanelId('x', async (panelId) => {
+          const panel = dashboard.getPanelById(panelId)!;
+          const url = await getExploreUrl({
+            panel,
+            datasourceSrv: getDatasourceSrv(),
+            timeSrv: getTimeSrv(),
+          });
+
+          if (url) {
+            const urlWithoutBase = locationUtil.stripBaseFromUrl(url);
+            if (urlWithoutBase) {
+              locationService.push(urlWithoutBase);
+            }
+          }
+        });
+      }
+
+      // delete panel
+      this.bindWithPanelId('p r', (panelId) => {
+        if (dashboard.canEditPanelById(panelId) && !(dashboard.panelInView || dashboard.panelInEdit)) {
+          appEvents.publish(new RemovePanelEvent(panelId));
+        }
+      });
+
+      // duplicate panel
+      this.bindWithPanelId('p d', (panelId) => {
+        if (dashboard.canEditPanelById(panelId)) {
+          const panelIndex = dashboard.getPanelInfoById(panelId)!.index;
+          dashboard.duplicatePanel(dashboard.panels[panelIndex]);
+        }
+      });
+
+      // share panel
+      this.bindWithPanelId('p s', (panelId) => {
+        const panelInfo = dashboard.getPanelInfoById(panelId);
+
         appEvents.publish(
           new ShowModalReactEvent({
-            component: SaveDashboardModalProxy,
+            component: ShareModal,
             props: {
-              dashboard,
+              dashboard: dashboard,
+              panel: panelInfo?.panel,
             },
           })
         );
-      }
-    });
+      });
 
-    this.bind('t z', () => {
-      appEvents.publish(new ZoomOutEvent(2));
-    });
+      // toggle panel legend
+      this.bindWithPanelId('p l', (panelId) => {
+        const panelInfo = dashboard.getPanelInfoById(panelId)!;
 
-    this.bind('ctrl+z', () => {
-      appEvents.publish(new ZoomOutEvent(2));
-    });
-
-    this.bind('t left', () => {
-      appEvents.publish(new ShiftTimeEvent(ShiftTimeEventPayload.Left));
-    });
-
-    this.bind('t right', () => {
-      appEvents.publish(new ShiftTimeEvent(ShiftTimeEventPayload.Right));
-    });
-
-    // edit panel
-    this.bindWithPanelId('e', (panelId) => {
-      if (dashboard.canEditPanelById(panelId)) {
-        const isEditing = locationService.getSearchObject().editPanel !== undefined;
-        locationService.partial({ editPanel: isEditing ? null : panelId });
-      }
-    });
-
-    // view panel
-    this.bindWithPanelId('v', (panelId) => {
-      const isViewing = locationService.getSearchObject().viewPanel !== undefined;
-      locationService.partial({ viewPanel: isViewing ? null : panelId });
-    });
-
-    this.bindWithPanelId('i', (panelId) => {
-      locationService.partial({ inspect: panelId });
-    });
-
-    // jump to explore if permissions allow
-    if (contextSrv.hasAccessToExplore()) {
-      this.bindWithPanelId('x', async (panelId) => {
-        const panel = dashboard.getPanelById(panelId)!;
-        const url = await getExploreUrl({
-          panel,
-          datasourceSrv: getDatasourceSrv(),
-          timeSrv: getTimeSrv(),
-        });
-
-        if (url) {
-          const urlWithoutBase = locationUtil.stripBaseFromUrl(url);
-          if (urlWithoutBase) {
-            locationService.push(urlWithoutBase);
-          }
+        if (panelInfo.panel.legend) {
+          panelInfo.panel.legend.show = !panelInfo.panel.legend.show;
+          panelInfo.panel.render();
         }
       });
+
+      // toggle all panel legends
+      this.bind('d l', () => {
+        dashboard.toggleLegendsForAll();
+      });
+
+      // collapse all rows
+      this.bind('d shift+c', () => {
+        dashboard.collapseRows();
+      });
+
+      // expand all rows
+      this.bind('d shift+e', () => {
+        dashboard.expandRows();
+      });
+
+      this.bind('d n', () => {
+        locationService.push('/dashboard/new');
+      });
+
+      this.bind('d r', () => {
+        dashboard.startRefresh();
+      });
+
+      this.bind('d s', () => {
+        this.showDashEditView();
+      });
+
+      this.bind('d k', () => {
+        toggleKioskMode();
+      });
+
+      //Autofit panels
+      this.bind('d a', () => {
+        // this has to be a full page reload
+        const queryParams = locationService.getSearchObject();
+        const newUrlParam = queryParams.autofitpanels ? '' : '&autofitpanels';
+        window.location.href = window.location.href + newUrlParam;
+      });
     }
-
-    // delete panel
-    this.bindWithPanelId('p r', (panelId) => {
-      if (dashboard.canEditPanelById(panelId) && !(dashboard.panelInView || dashboard.panelInEdit)) {
-        appEvents.publish(new RemovePanelEvent(panelId));
-      }
-    });
-
-    // duplicate panel
-    this.bindWithPanelId('p d', (panelId) => {
-      if (dashboard.canEditPanelById(panelId)) {
-        const panelIndex = dashboard.getPanelInfoById(panelId)!.index;
-        dashboard.duplicatePanel(dashboard.panels[panelIndex]);
-      }
-    });
-
-    // share panel
-    this.bindWithPanelId('p s', (panelId) => {
-      const panelInfo = dashboard.getPanelInfoById(panelId);
-
-      appEvents.publish(
-        new ShowModalReactEvent({
-          component: ShareModal,
-          props: {
-            dashboard: dashboard,
-            panel: panelInfo?.panel,
-          },
-        })
-      );
-    });
-
-    // toggle panel legend
-    this.bindWithPanelId('p l', (panelId) => {
-      const panelInfo = dashboard.getPanelInfoById(panelId)!;
-
-      if (panelInfo.panel.legend) {
-        panelInfo.panel.legend.show = !panelInfo.panel.legend.show;
-        panelInfo.panel.render();
-      }
-    });
-
-    // toggle all panel legends
-    this.bind('d l', () => {
-      dashboard.toggleLegendsForAll();
-    });
-
-    // collapse all rows
-    this.bind('d shift+c', () => {
-      dashboard.collapseRows();
-    });
-
-    // expand all rows
-    this.bind('d shift+e', () => {
-      dashboard.expandRows();
-    });
-
-    this.bind('d n', () => {
-      locationService.push('/dashboard/new');
-    });
-
-    this.bind('d r', () => {
-      dashboard.startRefresh();
-    });
-
-    this.bind('d s', () => {
-      this.showDashEditView();
-    });
-
-    this.bind('d k', () => {
-      toggleKioskMode();
-    });
-
-    //Autofit panels
-    this.bind('d a', () => {
-      // this has to be a full page reload
-      const queryParams = locationService.getSearchObject();
-      const newUrlParam = queryParams.autofitpanels ? '' : '&autofitpanels';
-      window.location.href = window.location.href + newUrlParam;
-    });
   }
 }
 
