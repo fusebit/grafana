@@ -133,18 +133,20 @@ export class KeybindingSrv {
 
   bind(keyArg: string | string[], fn: () => void) {
     const isInAnIframe = window.location !== window.parent.location;
-    if (!isInAnIframe) {
-      Mousetrap.bind(
-        keyArg,
-        (evt: any) => {
-          evt.preventDefault();
-          evt.stopPropagation();
-          evt.returnValue = false;
-          fn.call(this);
-        },
-        'keydown'
-      );
+    if (isInAnIframe) {
+      return;
     }
+
+    Mousetrap.bind(
+      keyArg,
+      (evt: any) => {
+        evt.preventDefault();
+        evt.stopPropagation();
+        evt.returnValue = false;
+        fn.call(this);
+      },
+      'keydown'
+    );
   }
 
   bindGlobal(keyArg: string, fn: () => void) {
