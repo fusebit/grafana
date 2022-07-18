@@ -132,6 +132,11 @@ export class KeybindingSrv {
   }
 
   bind(keyArg: string | string[], fn: () => void) {
+    const isInAnIframe = window.location !== window.parent.location;
+    if (isInAnIframe) {
+      return;
+    }
+
     Mousetrap.bind(
       keyArg,
       (evt: any) => {
