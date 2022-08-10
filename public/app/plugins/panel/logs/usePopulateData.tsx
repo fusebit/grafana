@@ -54,7 +54,7 @@ const usePopulateData = ({ data }: Props) => {
   }, [data]);
 
   useEffect(() => {
-    const postMessage = ({ data, origin }: any) => {
+    const postMessage = ({ data }: any) => {
       let payload: { msg: string; traceId?: string; spanId?: string };
       try {
         payload = JSON.parse(data || '{}');
