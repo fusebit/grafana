@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 const useNotifyHeight = () => {
   useEffect(() => {
     const interval = setInterval(() => {
-      if (self === top) {
+      if (window.location.origin === window.parent.location.origin) {
         return;
       }
 
