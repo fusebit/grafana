@@ -55,7 +55,8 @@ const usePopulateData = ({ data }: Props) => {
 
   useEffect(() => {
     const postMessage = ({ data, origin }: any) => {
-      if (origin === window.location.origin) {
+      const parentUrl = window.location !== window.parent.location ? document.referrer : document.location.origin;
+      if (origin.indexOf(parentUrl) > 0) {
         return;
       }
 
