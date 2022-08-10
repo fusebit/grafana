@@ -54,7 +54,11 @@ const usePopulateData = ({ data }: Props) => {
   }, [data]);
 
   useEffect(() => {
-    const postMessage = ({ data }: any) => {
+    const postMessage = ({ data, origin }: any) => {
+      if (origin === window.location.origin) {
+        return;
+      }
+
       let payload: { msg: string; traceId?: string; spanId?: string };
       try {
         payload = JSON.parse(data || '{}');
