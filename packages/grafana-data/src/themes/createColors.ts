@@ -300,7 +300,7 @@ class FusebitColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   background = {
-    canvas: palette.fusebit.blue,
+    canvas: palette.fusebit.white,
     primary: palette.fusebit.white,
     secondary: palette.fusebit.lightBlue,
   };
