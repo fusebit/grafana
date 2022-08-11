@@ -182,6 +182,8 @@ class DashNav extends PureComponent<Props> {
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
+    const urlParams = new URLSearchParams(window.location.search);
+    const disableTvButton = typeof urlParams.get('disableTvButton') === 'string';
     const tvButton = (
       <ToolbarButton tooltip="Cycle view mode" icon="monitor" onClick={this.onToggleTVMode} key="tv-button" />
     );
@@ -234,7 +236,11 @@ class DashNav extends PureComponent<Props> {
     this.addCustomContent(customRightActions, buttons);
 
     buttons.push(this.renderTimeControls());
-    buttons.push(tvButton);
+
+    if (!disableTvButton) {
+      buttons.push(tvButton);
+    }
+
     return buttons;
   }
 
