@@ -3,10 +3,12 @@ import { useEffect } from 'react';
 const useNotifyHeight = () => {
   useEffect(() => {
     const interval = setInterval(() => {
+      console.log('running interval');
       const scrollbar = document.querySelector('.scrollbar-view');
-      const panelTitle = document.querySelector('.panel-title');
-      if (scrollbar && panelTitle) {
-        const height = `${scrollbar?.scrollHeight + panelTitle?.clientHeight}px`;
+      if (scrollbar) {
+        const panelTitle = document.querySelector('.panel-title');
+        const height = `${scrollbar?.scrollHeight + (panelTitle?.clientHeight || 0)}px`;
+        console.log('posting message', height);
         window.parent.postMessage(height, '*');
       }
     }, 0);
