@@ -193,7 +193,7 @@ class DashNav extends PureComponent<Props> {
     }
 
     if (kioskMode === KioskMode.TV) {
-      return [this.renderTimeControls(), tvButton];
+      return [this.renderTimeControls(), !disableTvButton && tvButton];
     }
 
     if (canEdit && !isFullscreen) {

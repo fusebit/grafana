@@ -27,6 +27,8 @@ export interface Props {
 export const PageToolbar: FC<Props> = React.memo(
   ({ title, parent, pageIcon, onGoBack, children, titleHref, parentHref, leftItems, isFullscreen, className }) => {
     const styles = useStyles2(getStyles);
+    const urlParams = new URLSearchParams(window.location.search);
+    const disableBreadcrumbs = typeof urlParams.get('disableBreadcrumbs') === 'string';
 
     /**
      * .page-toolbar css class is used for some legacy css view modes (TV/Kiosk) and
@@ -45,7 +47,7 @@ export const PageToolbar: FC<Props> = React.memo(
 
     return (
       <div className={mainStyle}>
-        {pageIcon && !onGoBack && (
+        {pageIcon && !onGoBack && !disableBreadcrumbs && (
           <div className={styles.pageIcon}>
             <Icon name={pageIcon} size="lg" aria-hidden />
           </div>
@@ -63,37 +65,38 @@ export const PageToolbar: FC<Props> = React.memo(
             />
           </div>
         )}
-        <nav aria-label="Search links" className={styles.navElement}>
-          {parent && parentHref && (
-            <>
-              <Link
-                aria-label={`Search dashboard in the ${parent} folder`}
-                className={cx(styles.titleText, styles.parentLink, styles.titleLink)}
-                href={parentHref}
-              >
-                {parent} <span className={styles.parentIcon}></span>
-              </Link>
-              {titleHref && (
-                <span className={cx(styles.titleText, styles.titleDivider, styles.parentLink)} aria-hidden>
-                  /
-                </span>
-              )}
-            </>
-          )}
-
-          {title && titleHref && (
-            <h1 className={styles.h1Styles}>
-              <Link
-                aria-label="Search dashboard by name"
-                className={cx(styles.titleText, styles.titleLink)}
-                href={titleHref}
-              >
-                {title}
-              </Link>
-            </h1>
-          )}
-          {title && !titleHref && <h1 className={styles.titleText}>{title}</h1>}
-        </nav>
+        {!disableBreadcrumbs && (
+          <nav aria-label="Search links" className={styles.navElement}>
+            {parent && parentHref && (
+              <>
+                <Link
+                  aria-label={`Search dashboard in the ${parent} folder`}
+                  className={cx(styles.titleText, styles.parentLink, styles.titleLink)}
+                  href={parentHref}
+                >
+                  {parent} <span className={styles.parentIcon}></span>
+                </Link>
+                {titleHref && (
+                  <span className={cx(styles.titleText, styles.titleDivider, styles.parentLink)} aria-hidden>
+                    /
+                  </span>
+                )}
+              </>
+            )}
+            {title && titleHref && (
+              <h1 className={styles.h1Styles}>
+                <Link
+                  aria-label="Search dashboard by name"
+                  className={cx(styles.titleText, styles.titleLink)}
+                  href={titleHref}
+                >
+                  {title}
+                </Link>
+              </h1>
+            )}
+            {title && !titleHref && <h1 className={styles.titleText}>{title}</h1>}
+          </nav>
+        )}
         {leftItems?.map((child, index) => (
           <div className={styles.leftActionItem} key={index}>
             {child}
