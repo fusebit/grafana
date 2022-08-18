@@ -7,11 +7,7 @@ const useNotifyHeight = () => {
       if (scrollbar && self !== top) {
         const panelTitle = document.querySelector('.panel-title');
         const height = `${scrollbar?.scrollHeight + (panelTitle?.clientHeight || 0)}px`;
-        const message = {
-          type: 'height',
-          value: height,
-        };
-        window.parent.postMessage(JSON.stringify(message), '*');
+        window.parent.postMessage(height, '*');
       }
     }, 0);
 
