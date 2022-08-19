@@ -62,6 +62,10 @@ const usePopulateData = ({ data }: Props) => {
         payload = { msg: data || '' };
       }
 
+      if (!payload.msg) {
+        return;
+      }
+
       const logs: ExternalLog[] = [...externalLogs];
       const newLog: ExternalLog = {
         ...payload,
