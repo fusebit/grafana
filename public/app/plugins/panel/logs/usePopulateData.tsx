@@ -62,7 +62,7 @@ const usePopulateData = ({ data }: Props) => {
         payload = { msg: data || '' };
       }
 
-      if (!payload.msg) {
+      if (!payload?.msg) {
         return;
       }
 
