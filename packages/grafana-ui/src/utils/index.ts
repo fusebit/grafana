@@ -17,6 +17,7 @@ export { createLogger } from './logger';
 export { attachDebugger } from './debug';
 export * from './nodeGraph';
 export { fuzzyMatch } from './fuzzy';
+export { getIsUIHidden } from './disableUi';
 
 // React utils
 import * as ReactUtils from './reactUtils';

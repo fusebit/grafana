@@ -1,6 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { css, cx } from '@emotion/css';
 import { GrafanaTheme2 } from '@grafana/data';
+import { getIsUIHidden } from '../../utils/index';
 import { useStyles2 } from '../../themes/ThemeContext';
 import { IconName } from '../../types';
 import { Icon } from '../Icon/Icon';
@@ -27,8 +28,7 @@ export interface Props {
 export const PageToolbar: FC<Props> = React.memo(
   ({ title, parent, pageIcon, onGoBack, children, titleHref, parentHref, leftItems, isFullscreen, className }) => {
     const styles = useStyles2(getStyles);
-    const urlParams = new URLSearchParams(window.location.search);
-    const disableBreadcrumbs = typeof urlParams.get('disableBreadcrumbs') === 'string';
+    const disableBreadcrumbs = getIsUIHidden('breadcrumbs');
 
     /**
      * .page-toolbar css class is used for some legacy css view modes (TV/Kiosk) and

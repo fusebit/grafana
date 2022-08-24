@@ -6,7 +6,7 @@ import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 // Components
 import { DashNavButton } from './DashNavButton';
 import { DashNavTimeControls } from './DashNavTimeControls';
-import { ButtonGroup, ModalsController, ToolbarButton, PageToolbar } from '@grafana/ui';
+import { ButtonGroup, ModalsController, ToolbarButton, PageToolbar, getIsUIHidden } from '@grafana/ui';
 import { locationUtil, textUtil } from '@grafana/data';
 // State
 import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
@@ -182,8 +182,7 @@ class DashNav extends PureComponent<Props> {
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
-    const urlParams = new URLSearchParams(window.location.search);
-    const disableTvButton = typeof urlParams.get('disableTvButton') === 'string';
+    const disableTvButton = getIsUIHidden('tvButton');
     const tvButton = (
       <ToolbarButton tooltip="Cycle view mode" icon="monitor" onClick={this.onToggleTVMode} key="tv-button" />
     );
