@@ -28,7 +28,7 @@ export interface Props {
 export const PageToolbar: FC<Props> = React.memo(
   ({ title, parent, pageIcon, onGoBack, children, titleHref, parentHref, leftItems, isFullscreen, className }) => {
     const styles = useStyles2(getStyles);
-    const disableBreadcrumbs = getIsUIHidden('breadcrumbs');
+    const hideBreadcrumbs = getIsUIHidden('breadcrumbs');
 
     /**
      * .page-toolbar css class is used for some legacy css view modes (TV/Kiosk) and
@@ -47,7 +47,7 @@ export const PageToolbar: FC<Props> = React.memo(
 
     return (
       <div className={mainStyle}>
-        {pageIcon && !onGoBack && !disableBreadcrumbs && (
+        {pageIcon && !onGoBack && !hideBreadcrumbs && (
           <div className={styles.pageIcon}>
             <Icon name={pageIcon} size="lg" aria-hidden />
           </div>
@@ -65,7 +65,7 @@ export const PageToolbar: FC<Props> = React.memo(
             />
           </div>
         )}
-        {!disableBreadcrumbs && (
+        {!hideBreadcrumbs && (
           <nav aria-label="Search links" className={styles.navElement}>
             {parent && parentHref && (
               <>

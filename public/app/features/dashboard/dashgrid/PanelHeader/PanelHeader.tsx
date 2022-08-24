@@ -31,7 +31,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
   const title = panel.getDisplayTitle();
   const className = cx('panel-header', !(isViewing || isEditing) ? 'grid-drag-handle' : '');
   const styles = useStyles2(panelStyles);
-  const disablePanelTitle = getIsUIHidden('panelTitle');
+  const hidePanelTitle = getIsUIHidden('panelTitle');
 
   return (
     <>
@@ -45,7 +45,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
         error={error}
       />
       <div className={className}>
-        {!disablePanelTitle && (
+        {!hidePanelTitle && (
           <PanelHeaderMenuTrigger data-testid={selectors.components.Panels.Panel.title(title)}>
             {({ closeMenu, panelMenuOpen }) => {
               return (

@@ -182,7 +182,7 @@ class DashNav extends PureComponent<Props> {
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
-    const disableTvButton = getIsUIHidden('tvButton');
+    const hideTvButton = getIsUIHidden('tvButton');
     const tvButton = (
       <ToolbarButton tooltip="Cycle view mode" icon="monitor" onClick={this.onToggleTVMode} key="tv-button" />
     );
@@ -192,7 +192,7 @@ class DashNav extends PureComponent<Props> {
     }
 
     if (kioskMode === KioskMode.TV) {
-      return [this.renderTimeControls(), !disableTvButton && tvButton];
+      return [this.renderTimeControls(), !hideTvButton && tvButton];
     }
 
     if (canEdit && !isFullscreen) {
@@ -236,7 +236,7 @@ class DashNav extends PureComponent<Props> {
 
     buttons.push(this.renderTimeControls());
 
-    if (!disableTvButton) {
+    if (!hideTvButton) {
       buttons.push(tvButton);
     }
 
