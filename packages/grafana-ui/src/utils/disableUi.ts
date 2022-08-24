@@ -5,8 +5,8 @@ export const getIsUIHidden = (uiElement: string) => {
 
   // LEGACY SUPPORT - TODO: Remove once the ui gets hidden using hideUi
   const disablePanelTitle = urlParams.get('disablePanelTitle') === 'true';
-  const disableBreadcrumbs = typeof urlParams.get('disableBreadcrumbs') === 'string';
-  const disableTvButton = typeof urlParams.get('disableTvButton') === 'string';
+  const disableBreadcrumbs = urlParams.get('disablePanelTitle') === 'true';
+  const disableTvButton = urlParams.get('disablePanelTitle') === 'true';
   if (!isUiElementHidden && uiElement === 'panelTitle') {
     return disablePanelTitle;
   } else if (!isUiElementHidden && uiElement === 'breadcrumbs') {
