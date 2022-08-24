@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { css, cx } from '@emotion/css';
 import { DataLink, GrafanaTheme2, PanelData } from '@grafana/data';
-import { Icon, useStyles2 } from '@grafana/ui';
+import { Icon, useStyles2, getIsUIHidden } from '@grafana/ui';
 import { selectors } from '@grafana/e2e-selectors';
 
 import PanelHeaderCorner from './PanelHeaderCorner';
@@ -31,8 +31,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
   const title = panel.getDisplayTitle();
   const className = cx('panel-header', !(isViewing || isEditing) ? 'grid-drag-handle' : '');
   const styles = useStyles2(panelStyles);
-  const urlParams = new URLSearchParams(window.location.search);
-  const disablePanelTitle = typeof urlParams.get('disablePanelTitle') === 'string';
+  const hidePanelTitle = getIsUIHidden('panelTitle');
 
   return (
     <>
@@ -46,7 +45,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
         error={error}
       />
       <div className={className}>
-        {!disablePanelTitle && (
+        {!hidePanelTitle && (
           <PanelHeaderMenuTrigger data-testid={selectors.components.Panels.Panel.title(title)}>
             {({ closeMenu, panelMenuOpen }) => {
               return (
