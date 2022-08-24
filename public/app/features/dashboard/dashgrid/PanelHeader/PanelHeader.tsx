@@ -1,7 +1,7 @@
 import React, { FC } from 'react';
 import { css, cx } from '@emotion/css';
-import { DataLink, GrafanaTheme2, PanelData, getIsUIHidden } from '@grafana/data';
-import { Icon, useStyles2 } from '@grafana/ui';
+import { DataLink, GrafanaTheme2, PanelData } from '@grafana/data';
+import { Icon, useStyles2, getIsUIHidden } from '@grafana/ui';
 import { selectors } from '@grafana/e2e-selectors';
 
 import PanelHeaderCorner from './PanelHeaderCorner';
